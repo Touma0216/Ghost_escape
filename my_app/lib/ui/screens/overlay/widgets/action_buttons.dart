@@ -11,112 +11,85 @@ class ActionButtons extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final uiState = ref.watch(gameUiStateProvider);
 
-    // 各ボタン活性・非活性制御
-    final canPossess = uiState.canPossess;
-    final canDash = uiState.canDash;
-    final canInvestigate = uiState.canInvestigate;
+    final double btnRadius = 18; // ボタン半径（36px）
+    final double distance = 26;  // ひし形の各方向への距離
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // 上段2つ
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _ActionCircleButton(
-              icon: Icons.transform,
-              label: uiState.controlledCharacter == ControlledCharacter.honoka
-                  ? '憑依'
-                  : '離脱',
-              enabled: canPossess,
-              onPressed: () {
-                // TODO: 憑依・離脱ロジック
-              },
-            ),
-            const SizedBox(width: 16),
-            _ActionCircleButton(
-              icon: Icons.search,
-              label: '調べる',
-              enabled: canInvestigate,
-              onPressed: () {
-                // TODO: 調べるアクション
-              },
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        // 下段2つ
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _ActionCircleButton(
-              icon: Icons.directions_run,
-              label: 'ダッシュ',
-              enabled: canDash,
-              onPressed: () {
-                // TODO: ダッシュアクション
-              },
-            ),
-            const SizedBox(width: 16),
-            _ActionCircleButton(
-              icon: Icons.more_horiz,
-              label: 'サブ',
-              enabled: true,
-              onPressed: () {
-                // TODO: サブアクション
-              },
-            ),
-          ],
-        ),
-      ],
+    return SizedBox(
+      width: btnRadius * 3,
+      height: btnRadius * 3,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // 上
+          _DiamondActionButton(
+            icon: Icons.transform,
+            enabled: uiState.canPossess,
+            onPressed: () {},
+            offset: Offset(0, -distance),
+          ),
+          // 右
+          _DiamondActionButton(
+            icon: Icons.search,
+            enabled: uiState.canInvestigate,
+            onPressed: () {},
+            offset: Offset(distance, 0),
+          ),
+          // 下
+          _DiamondActionButton(
+            icon: Icons.directions_run,
+            enabled: uiState.canDash,
+            onPressed: () {},
+            offset: Offset(0, distance),
+          ),
+          // 左
+          _DiamondActionButton(
+            icon: Icons.more_horiz,
+            enabled: true,
+            onPressed: () {},
+            offset: Offset(-distance, 0),
+          ),
+        ],
+      ),
     );
   }
 }
 
-class _ActionCircleButton extends StatelessWidget {
+class _DiamondActionButton extends StatelessWidget {
   final IconData icon;
-  final String label;
   final bool enabled;
   final VoidCallback onPressed;
-  const _ActionCircleButton({
+  final Offset offset;
+  const _DiamondActionButton({
     required this.icon,
-    required this.label,
     required this.enabled,
     required this.onPressed,
+    required this.offset,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Material(
+    return Positioned(
+      child: Transform.translate(
+        offset: offset,
+        child: Material(
           color: enabled ? Colors.white : Colors.grey[300],
           shape: const CircleBorder(),
-          elevation: enabled ? 4 : 0,
+          elevation: enabled ? 2 : 0,
           child: InkWell(
             borderRadius: BorderRadius.circular(28),
             onTap: enabled ? onPressed : null,
             child: SizedBox(
-              width: 56,
-              height: 56,
+              width: 28,
+              height: 28,
               child: Icon(
                 icon,
-                size: 32,
+                size: 20,
                 color: enabled ? Colors.black87 : Colors.grey,
               ),
             ),
           ),
         ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: enabled ? Colors.black87 : Colors.grey,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

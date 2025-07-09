@@ -13,29 +13,31 @@ class GameUiOverlay extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // UIパーツを四隅＋上中央に配置（Stack＋Align構成）
     return IgnorePointer(
       ignoring: false,
       child: Stack(
         children: [
-          // 左上: メニュー、ほのかアイコン、体力バー
-          const Positioned(
-            left: 16,
-            top: 16,
-            child: StatusBar(),
-          ),
-          // 中央上: 憑依タイマー（ほのか操作時のみ自動表示）
-          const Positioned(
-            top: 16,
+          // 上部UI：左右対称Row＋中央タイマー
+          Positioned(
             left: 0,
             right: 0,
-            child: PossessionTimer(),
-          ),
-          // 右上: スタミナバー、操作キャラアイコン
-          const Positioned(
-            right: 16,
             top: 16,
-            child: CharacterIconBar(),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(left: 16),
+                  child: StatusBar(),
+                ),
+                const Expanded(child: SizedBox()),
+                const PossessionTimer(),
+                const Expanded(child: SizedBox()),
+                const Padding(
+                  padding: EdgeInsets.only(right: 16),
+                  child: CharacterIconBar(),
+                ),
+              ],
+            ),
           ),
           // 左下: 十字キー
           const Positioned(
@@ -43,10 +45,11 @@ class GameUiOverlay extends HookConsumerWidget {
             bottom: 16,
             child: MovementController(),
           ),
-          // 右下: 4ボタン
+          // 右下: 4ボタン（ひし形、スティック中央と完全揃え）
+          // bottom値はMovementControllerと同一に
           const Positioned(
-            right: 32,
-            bottom: 32,
+            right: 36,
+            bottom: 36,
             child: ActionButtons(),
           ),
         ],

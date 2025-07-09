@@ -10,8 +10,6 @@ class CharacterIconBar extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final uiState = ref.watch(gameUiStateProvider);
-
-    // キャラによってアイコン切替
     final isHonoka = uiState.controlledCharacter == ControlledCharacter.honoka;
     final isPino = uiState.controlledCharacter == ControlledCharacter.pino;
 
@@ -28,25 +26,29 @@ class CharacterIconBar extends HookConsumerWidget {
       label = '敵';
     }
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        // スタミナバー
-        _StaminaBar(stamina: uiState.dashStamina),
-        const SizedBox(width: 12),
-        // 操作キャラアイコン
-        Column(
-          children: [
-            CircleAvatar(
-              radius: 18,
-              backgroundColor: Colors.black12,
-              child: Icon(iconData, size: 28, color: Colors.black87),
-            ),
-            const SizedBox(height: 2),
-            Text(label, style: const TextStyle(fontSize: 12)),
-          ],
-        ),
-      ],
+    return SizedBox(
+      height: 48, // 左上バーと合わせる
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // スタミナバー
+          _StaminaBar(stamina: uiState.dashStamina),
+          const SizedBox(width: 8),
+          // キャラアイコン（右寄せ）
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                radius: 16,
+                backgroundColor: Colors.black12,
+                child: Icon(iconData, size: 22, color: Colors.black87),
+              ),
+              const SizedBox(height: 2),
+              Text(label, style: const TextStyle(fontSize: 11)),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
@@ -57,15 +59,14 @@ class _StaminaBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 青→黄
     Color lerped = Color.lerp(Colors.blue, Colors.yellow, 1 - stamina)!;
     return Container(
-      width: 90,
-      height: 16,
+      width: 128, // 左上バーと同じ長さ
+      height: 18,
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.black, width: 1.5),
+        border: Border.all(color: Colors.black, width: 1.4),
         borderRadius: BorderRadius.circular(4),
-        color: Colors.yellow.shade100.withOpacity(0.4),
+        color: Colors.yellow.shade100.withOpacity(0.25),
       ),
       alignment: Alignment.centerLeft,
       child: FractionallySizedBox(
