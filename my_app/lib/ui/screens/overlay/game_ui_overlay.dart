@@ -41,8 +41,8 @@ class GameUiOverlay extends HookConsumerWidget {
           ),
           // 左下: 十字キー
           const Positioned(
-            left: 16,
-            bottom: 16,
+            left: 24,
+            bottom: 24,
             child: MovementController(),
           ),
           // 右下: 4ボタン（ひし形、スティック中央と完全揃え）

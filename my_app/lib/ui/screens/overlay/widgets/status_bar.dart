@@ -12,11 +12,11 @@ class StatusBar extends HookConsumerWidget {
     final uiState = ref.watch(gameUiStateProvider);
 
     return SizedBox(
-      height: 48, // 右上と合わせる
+      height: 48,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // メニュー
+          // メニューボタン
           IconButton(
             icon: const Icon(Icons.menu, size: 28),
             tooltip: 'メニュー',
@@ -26,14 +26,14 @@ class StatusBar extends HookConsumerWidget {
             },
           ),
           const SizedBox(width: 8),
-          // キャラアイコン（左寄せ）
+          // ほのかアイコン
           CircleAvatar(
             radius: 16,
             backgroundColor: Colors.black12,
             child: Icon(Icons.face, size: 22, color: Colors.black87),
           ),
           const SizedBox(width: 8),
-          // HPバー
+          // 体力バー（短く！）
           _HonokaHpBar(hp: uiState.honokaHp),
         ],
       ),
@@ -49,7 +49,7 @@ class _HonokaHpBar extends StatelessWidget {
   Widget build(BuildContext context) {
     Color lerped = Color.lerp(Colors.green, Colors.red, 1 - hp)!;
     return Container(
-      width: 128, // 右上バーと同じ長さ
+      width: 64,  // ← ここを縮小！（もともと128や140だった場合の半分以下）
       height: 18,
       decoration: BoxDecoration(
         border: Border.all(color: Colors.black, width: 1.4),

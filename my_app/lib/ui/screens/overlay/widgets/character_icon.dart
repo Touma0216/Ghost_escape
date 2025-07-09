@@ -14,38 +14,30 @@ class CharacterIconBar extends HookConsumerWidget {
     final isPino = uiState.controlledCharacter == ControlledCharacter.pino;
 
     IconData iconData;
-    String label;
     if (isHonoka) {
       iconData = Icons.face;
-      label = 'ほのか';
     } else if (isPino) {
       iconData = Icons.pets;
-      label = 'ピノ';
     } else {
       iconData = Icons.emoji_people;
-      label = '敵';
     }
 
     return SizedBox(
-      height: 48, // 左上バーと合わせる
+      height: 48,
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center, // ここがポイント
         children: [
           // スタミナバー
           _StaminaBar(stamina: uiState.dashStamina),
           const SizedBox(width: 8),
-          // キャラアイコン（右寄せ）
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircleAvatar(
-                radius: 16,
-                backgroundColor: Colors.black12,
-                child: Icon(iconData, size: 22, color: Colors.black87),
-              ),
-              const SizedBox(height: 2),
-              Text(label, style: const TextStyle(fontSize: 11)),
-            ],
+          // アイコン（バーと中心を揃える）
+          Align(
+            alignment: Alignment.center,
+            child: CircleAvatar(
+              radius: 16,
+              backgroundColor: Colors.black12,
+              child: Icon(iconData, size: 22, color: Colors.black87),
+            ),
           ),
         ],
       ),
@@ -61,7 +53,7 @@ class _StaminaBar extends StatelessWidget {
   Widget build(BuildContext context) {
     Color lerped = Color.lerp(Colors.blue, Colors.yellow, 1 - stamina)!;
     return Container(
-      width: 128, // 左上バーと同じ長さ
+      width: 128,
       height: 18,
       decoration: BoxDecoration(
         border: Border.all(color: Colors.black, width: 1.4),
