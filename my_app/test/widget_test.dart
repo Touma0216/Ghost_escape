@@ -9,12 +9,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:my_app/main.dart';
+import 'package:my_app/ui/screens/overlay/game_ui_overlay.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
-
+  testWidgets('Game screen renders', (WidgetTester tester) async {
+    // Build the app with ProviderScope like main.dart does.
+    await tester.pumpWidget(
+      ProviderScope(
+        child: PinoNoTegamiApp(),
+      ),
+    );
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
     expect(find.text('1'), findsNothing);
@@ -26,5 +31,9 @@ void main() {
     // Verify that our counter has incremented.
     expect(find.text('0'), findsNothing);
     expect(find.text('1'), findsOneWidget);
+        // Verify that the placeholder game view is displayed.
+    expect(find.text('Game View (実装領域)'), findsOneWidget);
+    // Verify that the UI overlay widget is part of the widget tree.
+    expect(find.byType(GameUiOverlay), findsOneWidget);
   });
 }
