@@ -8,8 +8,23 @@ import 'widgets/movement_controller.dart';
 import 'widgets/action_buttons.dart';
 import 'widgets/possession_timer.dart';
 
+// ★ここから: コールバック型追加
+import 'package:my_app/ui/screens/overlay/widgets/movement_controller.dart';
+typedef DPadCallback = void Function(DPadRegion direction);
+typedef VoidCallback = void Function();
+// ★ここまで
+
 class GameUiOverlay extends HookConsumerWidget {
-  const GameUiOverlay({super.key});
+  // ★ここから: コールバックを受け取る
+  final DPadCallback? onDPad;
+  final VoidCallback? onDPadRelease;
+
+  const GameUiOverlay({
+    super.key,
+    this.onDPad,
+    this.onDPadRelease,
+  });
+  // ★ここまで
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -40,13 +55,17 @@ class GameUiOverlay extends HookConsumerWidget {
             ),
           ),
           // 左下: 十字キー
-          const Positioned(
+          // ★ここから: コールバックを渡す
+          Positioned(
             left: 24,
             bottom: 24,
-            child: MovementController(),
+            child: MovementController(
+              onPressed: onDPad,
+              onReleased: onDPadRelease,
+            ),
           ),
-          // 右下: 4ボタン（ひし形、スティック中央と完全揃え）
-          // bottom値はMovementControllerと同一に
+          // ★ここまで
+          // 右下: 4ボタン
           const Positioned(
             right: 36,
             bottom: 36,
