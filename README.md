@@ -33,28 +33,6 @@
   - アクションボタン4つ（憑依、調べる、ダッシュ、予備）
 
 # ディレクトリ
-lib/
-├── main.dart                         # アプリのエントリーポイント
-├── game_screen.dart                  # ゲーム画面とUIの統合
-├── models/
-│   └── game_state.dart               # ゲーム全体の状態（HP、スタミナ、憑依など）
-├── providers/
-│   ├── possession_provider.dart      # 憑依状態を管理するProvider
-│   ├── hp_provider.dart              # HP管理用
-│   └── other_providers.dart          # その他ステータス
-├── ui/
-│   ├── overlay/
-│   │   ├── action_buttons.dart       # アクションボタン群
-│   │   ├── character_icon.dart       # キャラクターアイコン表示
-│   │   ├── hp_bar.dart               # 体力バー
-│   │   ├── stamina_bar.dart          # スタミナバー
-│   │   ├── possession_timer.dart     # 憑依タイマー
-│   │   ├── joystick.dart             # スティックUI（方向パッド）
-│   │   └── overlay_manager.dart      # 各UIの組み合わせ（必要に応じて）
-│   └── widgets/
-│       └── common_button.dart        # 共通ボタンなど
-└── utils/
-    └── constants.dart                # カラーコードや定数
 
 
 # 状態管理（hooks_riverpod）
