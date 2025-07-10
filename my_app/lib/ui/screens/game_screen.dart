@@ -1,25 +1,34 @@
-// ファイル名: lib/ui/screens/game_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:my_app/ui/screens/overlay/game_ui_overlay.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-
+import 'package:my_app/ui/game/engine/tile_map_widget.dart';
 
 class GameScreen extends StatelessWidget {
+  const GameScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // 1レイヤー目: ゲーム本体（背景やゲームロジック部分。ここは仮の白背景）
-          Positioned.fill(
-            child: Container(
-              color: Colors.white,
-              // ゲーム本体ウィジェットに差し替えOK
-              child: const Center(child: Text('Game View (実装領域)', style: TextStyle(fontSize: 18))),
+          // 1: フィールド
+          const TileMapWidget(
+            tileImageAsset: 'assets/material/prison_floor.png',
+            tileSize: 64,
+          ),
+          // 2: ほのかを中央に仮配置
+          Positioned(
+            left: MediaQuery.of(context).size.width / 2 - 32, // 64px分中央
+            top: MediaQuery.of(context).size.height / 2 - 32,
+            child: Image.asset(
+              'assets/char/honoka_down_1.png',
+              width: 64,
+              height: 64,
+              fit: BoxFit.contain,
+              filterQuality: FilterQuality.none, // ←ドット絵に必須！
             ),
           ),
-          // 2レイヤー目: UIオーバーレイ
+
+          // 3: UIオーバーレイ
           const GameUiOverlay(),
         ],
       ),

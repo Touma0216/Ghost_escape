@@ -16,7 +16,7 @@ class PinoNoTegamiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'ピノの手紙',
+      title: 'ホラーゲーム',
       theme: ThemeData(
         useMaterial3: true,
         fontFamily: 'Roboto',

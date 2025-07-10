@@ -22,5 +22,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  # assets:  # ←画像や音声など使う場合はここに追加
-  #   - assets/
+  assets:
+     - assets/char/
+     - assets/material/
