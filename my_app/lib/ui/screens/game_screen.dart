@@ -5,19 +5,28 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_app/ui/screens/overlay/game_ui_overlay.dart';
 import 'package:my_app/ui/game/engine/tile_map_widget.dart';
 import 'package:my_app/ui/game/models/player_model.dart';
-import 'package:my_app/ui/screens/overlay/widgets/movement_controller.dart';
+
+// 画面サイズからtileSizeを計算するProvider
+final tileSizeProvider = Provider<double>((ref) {
+  final size = WidgetsBinding.instance.window.physicalSize /
+      WidgetsBinding.instance.window.devicePixelRatio;
+  return size.shortestSide / TileMapWidget.roomWidth;
+});
 
 // PlayerModelのProvider
-final playerProvider = ChangeNotifierProvider((ref) => PlayerModel(
-      x: 160,
-      y: 160,
-    ));
+final playerProvider = ChangeNotifierProvider<PlayerModel>((ref) {
+  final tileSize = ref.watch(tileSizeProvider);
+  return PlayerModel(
+    x: tileSize * 2,
+    y: tileSize * 2,
+    tileSize: tileSize,
+  );
+});
 
 class GameScreen extends HookConsumerWidget {
   const GameScreen({super.key});
 
-  // Flutter 3.7以降対応
-  void _precacheAllImages(BuildContext context) {
+  void _precacheAllImages(BuildContext context, double tileSize) {
     const dirs = ['down', 'up', 'left', 'right'];
     const frames = [0, 1, 2];
     for (final dir in dirs) {
@@ -32,35 +41,36 @@ class GameScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tileSize = ref.watch(tileSizeProvider);
     final player = ref.watch(playerProvider);
 
-    // precacheを必ず最初のビルドで1回だけ実行（毎回やらないように）
+    // tileSizeが変わったらplayerにも反映
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _precacheAllImages(context);
+      _precacheAllImages(context, tileSize);
+      if (player.tileSize != tileSize) {
+        ref.read(playerProvider).updateTileSize(tileSize);
+      }
     });
 
     return Scaffold(
       body: Stack(
         children: [
-          // 1: フィールド
-          const TileMapWidget(
+          TileMapWidget(
             tileImageAsset: 'assets/material/prison_floor.png',
-            tileSize: 64,
+            tileSize: tileSize,
           ),
-          // 2: ほのか（位置/画像/アニメ連動）
           Positioned(
             left: player.x,
             top: player.y,
             child: Image.asset(
               player.currentImageAsset,
-              width: 64,
-              height: 64,
+              width: tileSize,
+              height: tileSize,
               fit: BoxFit.contain,
               filterQuality: FilterQuality.none,
-              gaplessPlayback: false, // ←プリキャッシュと併用で残像ゼロ
+              gaplessPlayback: false,
             ),
           ),
-          // 3: UIオーバーレイ（十字キーにコールバック連携!）
           GameUiOverlay(
             onDPad: (dir) {
               ref.read(playerProvider).move(dir);

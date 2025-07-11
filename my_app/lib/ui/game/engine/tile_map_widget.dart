@@ -1,9 +1,11 @@
+// lib/ui/game/engine/tile_map_widget.dart
+
 import 'package:flutter/material.dart';
 
 class TileMapWidget extends StatelessWidget {
   final String tileImageAsset;
   final double tileSize;
-  // 0=床, 1=壁
+
   static const List<List<int>> roomMap = [
     [1,1,1,1,1,1],
     [1,0,0,0,0,1],
@@ -41,8 +43,8 @@ class TileMapWidget extends StatelessWidget {
               height: tileSize,
               child: Image.asset(
                 roomMap[y][x] == 1
-                    ? 'assets/material/prison_wall.png'
-                    : tileImageAsset,
+                  ? 'assets/material/prison_wall.png'
+                  : tileImageAsset,
                 width: tileSize,
                 height: tileSize,
                 fit: BoxFit.fill,
