@@ -1,4 +1,4 @@
-// ファイル名: lib/ui/overlay/widgets/character_icon.dart
+// lib/ui/overlay/widgets/character_icon.dart
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -13,32 +13,28 @@ class CharacterIconBar extends HookConsumerWidget {
     final isHonoka = uiState.controlledCharacter == ControlledCharacter.honoka;
     final isPino = uiState.controlledCharacter == ControlledCharacter.pino;
 
-    IconData iconData;
-    if (isHonoka) {
-      iconData = Icons.face;
-    } else if (isPino) {
-      iconData = Icons.pets;
-    } else {
-      iconData = Icons.emoji_people;
-    }
-
     return SizedBox(
       height: 48,
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center, // ここがポイント
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // スタミナバー
+          // ← スタミナバー等は元のまま
           _StaminaBar(stamina: uiState.dashStamina),
           const SizedBox(width: 8),
-          // アイコン（バーと中心を揃える）
-          Align(
-            alignment: Alignment.center,
-            child: CircleAvatar(
-              radius: 16,
-              backgroundColor: Colors.black12,
-              child: Icon(iconData, size: 22, color: Colors.black87),
+          // ここだけ純粋な画像挿入
+          if (isHonoka)
+            Image.asset(
+              'assets/char/pino_icon.png',
+              width: 32, // 必要に応じて調整
+              height: 32,
+              fit: BoxFit.contain,
+            )
+          else
+            Icon(
+              isPino ? Icons.pets : Icons.emoji_people,
+              size: 28,
+              color: Colors.black87,
             ),
-          ),
         ],
       ),
     );
@@ -46,7 +42,7 @@ class CharacterIconBar extends HookConsumerWidget {
 }
 
 class _StaminaBar extends StatelessWidget {
-  final double stamina; // 0.0~1.0
+  final double stamina;
   const _StaminaBar({required this.stamina});
 
   @override

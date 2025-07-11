@@ -26,14 +26,15 @@ class StatusBar extends HookConsumerWidget {
             },
           ),
           const SizedBox(width: 8),
-          // ほのかアイコン
-          CircleAvatar(
-            radius: 16,
-            backgroundColor: Colors.black12,
-            child: Icon(Icons.face, size: 22, color: Colors.black87),
+          // ★ここを純粋な画像だけに！
+          Image.asset(
+            'assets/char/honoka_icon.png',
+            width: 32,   // デザインに応じて調整
+            height: 32,
+            fit: BoxFit.contain,
           ),
           const SizedBox(width: 8),
-          // 体力バー（短く！）
+          // 体力バー（短め！）
           _HonokaHpBar(hp: uiState.honokaHp),
         ],
       ),
@@ -49,7 +50,7 @@ class _HonokaHpBar extends StatelessWidget {
   Widget build(BuildContext context) {
     Color lerped = Color.lerp(Colors.green, Colors.red, 1 - hp)!;
     return Container(
-      width: 64,  // ← ここを縮小！（もともと128や140だった場合の半分以下）
+      width: 64,
       height: 18,
       decoration: BoxDecoration(
         border: Border.all(color: Colors.black, width: 1.4),

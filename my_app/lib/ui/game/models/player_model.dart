@@ -1,5 +1,3 @@
-// lib/ui/game/models/player_model.dart
-
 import 'package:flutter/material.dart';
 import 'package:my_app/ui/screens/overlay/widgets/movement_controller.dart';
 import 'package:my_app/ui/game/engine/tile_map_widget.dart';
@@ -26,7 +24,7 @@ class PlayerModel extends ChangeNotifier {
   void move(DPadRegion dir) {
     direction = dir;
     double nextX = x, nextY = y;
-    double step = tileSize / 8; // スピードはtileSize比率
+    double step = tileSize / 8;
     switch (dir) {
       case DPadRegion.up:
         nextY -= step;
@@ -41,19 +39,29 @@ class PlayerModel extends ChangeNotifier {
         nextX += step;
         break;
     }
-    // 四隅のどれかが壁タイルなら止める
-    final charSize = tileSize;
-    final corners = [
-      Offset(0, 0),
-      Offset(charSize - 1, 0),
-      Offset(0, charSize - 1),
-      Offset(charSize - 1, charSize - 1),
+
+    // --- 壁判定：上は胸、左右は中心寄り ---
+    final charW = tileSize;
+    final charH = tileSize;
+    final chestY = charH * 0.6; // 胸あたり（画像に応じて調整OK）
+    final sideX1 = charW * 0.3; // 体の左端
+    final sideX2 = charW * 0.7; // 体の右端
+
+    final wallCheckPoints = [
+      // 上：胸ラインだけ
+      Offset(sideX1, chestY),
+      Offset(sideX2, chestY),
+      // 下：左右中央だけ
+      Offset(sideX1, charH - 1),
+      Offset(sideX2, charH - 1),
     ];
-    for (final offset in corners) {
+
+    for (final offset in wallCheckPoints) {
       int tx = ((nextX + offset.dx) ~/ tileSize);
       int ty = ((nextY + offset.dy) ~/ tileSize);
       if (TileMapWidget.isWallTile(tx, ty)) return;
     }
+
     // 歩行アニメ
     if (!isMoving && walkFrame == 0) {
       walkFrame = 1;
@@ -67,6 +75,7 @@ class PlayerModel extends ChangeNotifier {
     y = nextY;
     notifyListeners();
   }
+
   void stop() {
     isMoving = false;
     _cancelIdleTimer();
