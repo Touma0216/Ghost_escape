@@ -14,7 +14,7 @@ class TileMapWidget extends ConsumerWidget {
     [1,0,0,0,0,0,1],
     [1,0,0,0,0,0,1],
     [1,0,0,0,0,0,1],
-    [1,1,1,1,1,1,1], // ←一番下
+    [1,1,1,1,1,1,1],
   ];
 
   const TileMapWidget({
@@ -38,6 +38,7 @@ class TileMapWidget extends ConsumerWidget {
 
     return Stack(
       children: [
+        // 全タイルを床として描画
         for (int y = 0; y < roomHeight; y++)
           for (int x = 0; x < roomWidth; x++)
             Positioned(
@@ -45,27 +46,12 @@ class TileMapWidget extends ConsumerWidget {
               top: y * tileSize,
               width: tileSize,
               height: tileSize,
-              child: Builder(
-                builder: (_) {
-                  String asset;
-                  // ↓ここで一番下の中央3つだけ「床画像」に見た目置き換え
-                  if (y == roomHeight - 1 && (x == 2 || x == 3 || x == 4)) {
-                    asset = tileImageAsset; // 床
-                  } else if (roomMap[y][x] == 1) {
-                    asset = (x == 0 || x == roomWidth - 1 || y == roomHeight - 1)
-                        ? 'assets/material/ceil.png'
-                        : 'assets/material/prison_wall.png';
-                  } else {
-                    asset = tileImageAsset; // 床
-                  }
-                  return Image.asset(
-                    asset,
-                    width: tileSize,
-                    height: tileSize,
-                    fit: BoxFit.fill,
-                    filterQuality: FilterQuality.none,
-                  );
-                },
+              child: Image.asset(
+                tileImageAsset, // 全て床画像
+                width: tileSize,
+                height: tileSize,
+                fit: BoxFit.fill,
+                filterQuality: FilterQuality.none,
               ),
             ),
       ],

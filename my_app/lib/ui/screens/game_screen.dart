@@ -1,8 +1,10 @@
+// GameScreen（修正版）
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_app/ui/screens/overlay/game_ui_overlay.dart';
 import 'package:my_app/ui/game/engine/tile_map_widget.dart';
 import 'package:my_app/ui/game/engine/prison_object_layer.dart';
+import 'package:my_app/ui/game/engine/wall_layer.dart'; // 新規追加
 import 'package:my_app/ui/game/models/player_model.dart';
 
 final tileSizeProvider = Provider<double>((ref) {
@@ -17,7 +19,6 @@ final playerProvider = ChangeNotifierProvider<PlayerModel>((ref) {
   return PlayerModel(x: tileSize * 2, y: tileSize * 2, tileSize: tileSize);
 });
 
-// ここで檻を自由に並べるリスト！拡張自由
 final List<CageObject> cages = [
   CageObject(x: 1.48, y: 5.00, assetPath: 'assets/material/cage.png'),
   CageObject(x: 1.96, y: 5.00, assetPath: 'assets/material/cage.png'),
@@ -26,7 +27,6 @@ final List<CageObject> cages = [
   CageObject(x: 3.57, y: 5.00, assetPath: 'assets/material/cage.png'),
   CageObject(x: 4.05, y: 5.00, assetPath: 'assets/material/cage.png'),
   CageObject(x: 4.53, y: 5.00, assetPath: 'assets/material/cage.png'),
-  // 必要なら追加で小物やopen画像など
 ];
 
 class GameScreen extends HookConsumerWidget {
@@ -93,14 +93,16 @@ class GameScreen extends HookConsumerWidget {
               offset: Offset(-offsetX, -offsetY),
               child: Stack(
                 children: [
-                  // 1. タイルマップ
+                  // 1. 床レイヤー（最下層）
                   TileMapWidget(
                     tileImageAsset: 'assets/material/prison_floor.png',
                     tileSize: tileSize,
                   ),
-                  // 2. 檻・扉レイヤー（リスト渡しで好きな数だけ）
+                  // 2. 檻・扉レイヤー
                   PrisonObjectLayer(tileSize: tileSize, cages: cages),
-                  // 3. プレイヤー
+                  // 3. 壁・天井レイヤー（檻の上）
+                  WallLayer(tileSize: tileSize),
+                  // 4. プレイヤー（最上層）
                   Positioned(
                     left: player.x,
                     top: player.y,
