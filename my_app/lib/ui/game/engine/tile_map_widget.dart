@@ -1,5 +1,3 @@
-// lib/ui/game/engine/tile_map_widget.dart
-
 import 'package:flutter/material.dart';
 
 class TileMapWidget extends StatelessWidget {
@@ -43,7 +41,10 @@ class TileMapWidget extends StatelessWidget {
               height: tileSize,
               child: Image.asset(
                 roomMap[y][x] == 1
-                  ? 'assets/material/prison_wall.png'
+                  // 左端・右端・下端だけceil.png、それ以外はprison_wall.png
+                  ? (x == 0 || x == roomWidth - 1 || y == roomHeight - 1
+                      ? 'assets/material/ceil.png'
+                      : 'assets/material/prison_wall.png')
                   : tileImageAsset,
                 width: tileSize,
                 height: tileSize,
