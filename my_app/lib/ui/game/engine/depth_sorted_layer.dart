@@ -60,7 +60,7 @@ class CageRenderObject extends RenderableObject {
   double get y => cage.y;
   
   @override
-  double get sortY => cage.y + 1; // 檻の底部でソート
+  double get sortY => (cage.y + 1) * 64; // 檻の底部でソート（タイル座標をピクセル座標に変換）
   
   @override
   Widget buildWidget(double tileSize) {
@@ -80,7 +80,7 @@ class CageRenderObject extends RenderableObject {
   }
 }
 
-// 下部の壁オブジェクト
+// 壁オブジェクト
 class WallRenderObject extends RenderableObject {
   final int tileX;
   final int tileY;
@@ -99,7 +99,7 @@ class WallRenderObject extends RenderableObject {
   double get y => tileY.toDouble();
   
   @override
-  double get sortY => tileY + 0.5; // 壁の中央でソート
+  double get sortY => (tileY + 1) * 64.0; // 壁の底部でソート（タイル座標をピクセル座標に変換）
   
   @override
   Widget buildWidget(double tileSize) {
@@ -146,30 +146,24 @@ class DepthSortedLayer extends ConsumerWidget {
       objects.add(CageRenderObject(cage));
     }
     
-    // 下部の壁を追加（プレイヤーより下にある壁のみ）
+    // 全ての壁を追加
     for (int y = 0; y < TileMapWidget.roomHeight; y++) {
       for (int x = 0; x < TileMapWidget.roomWidth; x++) {
         if (TileMapWidget.roomMap[y][x] == 1) {
-          // 下部の壁のみ（プレイヤーより下の位置）
-          final wallY = y.toDouble();
-          final playerTileY = player.y / tileSize;
-          
-          if (wallY >= playerTileY - 1) { // プレイヤーより下または同じ高さの壁
-            // 一番下の中央3つは除外
-            if (y == TileMapWidget.roomHeight - 1 && (x == 2 || x == 3 || x == 4)) {
-              continue;
-            }
-            
-            final asset = (x == 0 || x == TileMapWidget.roomWidth - 1 || y == TileMapWidget.roomHeight - 1)
-                ? 'assets/material/ceil.png'
-                : 'assets/material/prison_wall.png';
-            
-            objects.add(WallRenderObject(
-              tileX: x,
-              tileY: y,
-              assetPath: asset,
-            ));
+          // 一番下の中央3つは除外（出入り口）
+          if (y == TileMapWidget.roomHeight - 1 && (x == 2 || x == 3 || x == 4)) {
+            continue;
           }
+          
+          final asset = (x == 0 || x == TileMapWidget.roomWidth - 1 || y == TileMapWidget.roomHeight - 1)
+              ? 'assets/material/ceil.png'
+              : 'assets/material/prison_wall.png';
+          
+          objects.add(WallRenderObject(
+            tileX: x,
+            tileY: y,
+            assetPath: asset,
+          ));
         }
       }
     }

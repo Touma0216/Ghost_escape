@@ -5,8 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_app/ui/screens/overlay/game_ui_overlay.dart';
 import 'package:my_app/ui/game/engine/tile_map_widget.dart';
 import 'package:my_app/ui/game/engine/prison_object_layer.dart';
-import 'package:my_app/ui/game/engine/wall_layer.dart';
-import 'package:my_app/ui/game/engine/depth_sorted_layer.dart'; // 新規追加
+import 'package:my_app/ui/game/engine/depth_sorted_layer.dart';
 import 'package:my_app/ui/game/models/player_model.dart';
 
 final tileSizeProvider = Provider<double>((ref) {
@@ -105,12 +104,7 @@ class GameScreen extends HookConsumerWidget {
                     tileImageAsset: 'assets/material/prison_floor.png',
                     tileSize: tileSize,
                   ),
-                  // 2. 上部の壁（プレイヤーより手前に来る壁）
-                  WallLayer(
-                    tileSize: tileSize,
-                    wallType: WallType.background,
-                  ),
-                  // 3. 深度ソート済みレイヤー（プレイヤー + 檻 + 下部の壁）
+                  // 2. 深度ソート済みレイヤー（プレイヤー + 檻 + 全ての壁）
                   DepthSortedLayer(
                     tileSize: tileSize,
                     player: player,
