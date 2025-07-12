@@ -1,8 +1,5 @@
-// lib/ui/game/engine/tile_map_widget.dart
-
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:my_app/ui/game/models/cage_state.dart';
 
 class TileMapWidget extends ConsumerWidget {
   final String tileImageAsset;
@@ -34,11 +31,9 @@ class TileMapWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final cageState = ref.watch(cageStateProvider);
-
+    // 全部床で描画
     return Stack(
       children: [
-        // 全タイルを床として描画
         for (int y = 0; y < roomHeight; y++)
           for (int x = 0; x < roomWidth; x++)
             Positioned(
@@ -47,7 +42,7 @@ class TileMapWidget extends ConsumerWidget {
               width: tileSize,
               height: tileSize,
               child: Image.asset(
-                tileImageAsset, // 全て床画像
+                tileImageAsset,
                 width: tileSize,
                 height: tileSize,
                 fit: BoxFit.fill,

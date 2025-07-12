@@ -59,6 +59,24 @@ class PlayerModel extends ChangeNotifier {
     for (final offset in wallCheckPoints) {
       int tx = ((nextX + offset.dx) ~/ tileSize);
       int ty = ((nextY + offset.dy) ~/ tileSize);
+      
+      // 檻の特別な当たり判定（y=5, x=2,3,4の位置）
+      if (ty == 5 && (tx == 2 || tx == 3 || tx == 4)) {
+        // 檻の踏み込み可能範囲を設定（0.0-1.0で檻タイル内の位置）
+        const double cageWalkableArea = 1.8; // この値を調整で踏み込み具合を変更
+        
+        // キャラクターの現在位置が檻タイル内のどの位置にあるかを計算
+        double charPosInTile = ((nextY + offset.dy) % tileSize) / tileSize;
+        
+        // 檻の上部（1.0 - cageWalkableArea以上）の位置では当たり判定
+        if (charPosInTile <= (1.0 - cageWalkableArea)) {
+          if (TileMapWidget.isWallTile(tx, ty)) return;
+        }
+        // 下部（cageWalkableArea部分）は通れるのでスキップ
+        continue;
+      }
+      
+      // 通常の壁判定
       if (TileMapWidget.isWallTile(tx, ty)) return;
     }
 

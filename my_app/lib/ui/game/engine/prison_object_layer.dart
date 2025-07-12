@@ -1,5 +1,3 @@
-// lib/ui/game/engine/prison_object_layer.dart
-
 import 'package:flutter/material.dart';
 
 class CageObject {
