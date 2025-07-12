@@ -1,25 +1,33 @@
-// lib/ui/screens/game_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_app/ui/screens/overlay/game_ui_overlay.dart';
 import 'package:my_app/ui/game/engine/tile_map_widget.dart';
+import 'package:my_app/ui/game/engine/prison_object_layer.dart';
 import 'package:my_app/ui/game/models/player_model.dart';
 
 final tileSizeProvider = Provider<double>((ref) {
-  final size = WidgetsBinding.instance.window.physicalSize /
+  final size =
+      WidgetsBinding.instance.window.physicalSize /
       WidgetsBinding.instance.window.devicePixelRatio;
   return size.shortestSide / TileMapWidget.roomWidth;
 });
 
 final playerProvider = ChangeNotifierProvider<PlayerModel>((ref) {
   final tileSize = ref.watch(tileSizeProvider);
-  return PlayerModel(
-    x: tileSize * 2,
-    y: tileSize * 2,
-    tileSize: tileSize,
-  );
+  return PlayerModel(x: tileSize * 2, y: tileSize * 2, tileSize: tileSize);
 });
+
+// ここで檻を自由に並べるリスト！拡張自由
+final List<CageObject> cages = [
+  CageObject(x: 1.48, y: 5.00, assetPath: 'assets/material/cage.png'),
+  CageObject(x: 1.96, y: 5.00, assetPath: 'assets/material/cage.png'),
+  CageObject(x: 2.44, y: 5.00, assetPath: 'assets/material/cage.png'),
+  CageObject(x: 3, y: 5.00, assetPath: 'assets/material/cage_close.png'),
+  CageObject(x: 3.57, y: 5.00, assetPath: 'assets/material/cage.png'),
+  CageObject(x: 4.05, y: 5.00, assetPath: 'assets/material/cage.png'),
+  CageObject(x: 4.53, y: 5.00, assetPath: 'assets/material/cage.png'),
+  // 必要なら追加で小物やopen画像など
+];
 
 class GameScreen extends HookConsumerWidget {
   const GameScreen({super.key});
@@ -48,23 +56,17 @@ class GameScreen extends HookConsumerWidget {
 
     const double zoom = 1.5;
 
-    // マップのピクセル幅・高さ
     final mapPixelWidth = TileMapWidget.roomWidth * tileSize;
     final mapPixelHeight = TileMapWidget.roomHeight * tileSize;
 
-    // プレイヤーの中心座標（カメラの中心になる点）
     final playerCenterX = player.x + tileSize / 2;
     final playerCenterY = player.y + tileSize / 2;
-
-    // 表示領域の半分（ズーム考慮）
     final halfViewW = screenWidth / (2 * zoom);
     final halfViewH = screenHeight / (2 * zoom);
 
-    // カメラの左上を決定（マップ外に出ないよう clamp）
     double offsetX = playerCenterX - halfViewW;
     double offsetY = playerCenterY - halfViewH;
 
-    // clamp範囲を正確に出す（マップが小さくても絶対に0を超えない）
     offsetX = offsetX.clamp(
       0.0,
       (mapPixelWidth - screenWidth / zoom).clamp(0.0, double.infinity),
@@ -91,10 +93,14 @@ class GameScreen extends HookConsumerWidget {
               offset: Offset(-offsetX, -offsetY),
               child: Stack(
                 children: [
+                  // 1. タイルマップ
                   TileMapWidget(
                     tileImageAsset: 'assets/material/prison_floor.png',
                     tileSize: tileSize,
                   ),
+                  // 2. 檻・扉レイヤー（リスト渡しで好きな数だけ）
+                  PrisonObjectLayer(tileSize: tileSize, cages: cages),
+                  // 3. プレイヤー
                   Positioned(
                     left: player.x,
                     top: player.y,
