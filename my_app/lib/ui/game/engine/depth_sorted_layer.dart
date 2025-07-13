@@ -1,35 +1,31 @@
-// lib/ui/game/engine/depth_sorted_layer.dart
-
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:my_app/ui/game/engine/tile_map_widget.dart';
-import 'package:my_app/ui/game/engine/prison_object_layer.dart';
 import 'package:my_app/ui/game/models/player_model.dart';
 import 'package:my_app/ui/game/models/cage_state.dart';
+import 'package:my_app/ui/game/engine/prison_object_layer.dart';
+import 'package:path/path.dart' as path;
 
-// 描画可能オブジェクトの抽象クラス
 abstract class RenderableObject {
   double get x;
   double get y;
-  double get sortY; // ソート用のY座標
+  double get sortY;
   Widget buildWidget(double tileSize);
 }
 
-// プレイヤーオブジェクト
 class PlayerRenderObject extends RenderableObject {
   final PlayerModel player;
-  
+
   PlayerRenderObject(this.player);
-  
+
   @override
   double get x => player.x;
-  
+
   @override
   double get y => player.y;
-  
+
   @override
-  double get sortY => player.y + player.tileSize; // プレイヤーの足元でソート
-  
+  double get sortY => player.y + player.tileSize;
+
   @override
   Widget buildWidget(double tileSize) {
     return Positioned(
@@ -41,27 +37,39 @@ class PlayerRenderObject extends RenderableObject {
         height: tileSize,
         fit: BoxFit.contain,
         filterQuality: FilterQuality.none,
-        gaplessPlayback: false,
       ),
     );
   }
 }
 
-// 檻オブジェクト
 class CageRenderObject extends RenderableObject {
   final CageObject cage;
-  
-  CageRenderObject(this.cage);
-  
+  final PlayerModel player;
+
+  CageRenderObject(this.cage, this.player);
+
   @override
   double get x => cage.x;
-  
+
   @override
   double get y => cage.y;
-  
+
   @override
-  double get sortY => (cage.y + 1) * 64; // 檻の底部でソート（タイル座標をピクセル座標に変換）
-  
+  double get sortY {
+    final fileName = path.basename(cage.assetPath);
+    final isDynamicCage = [
+      'cage.png',
+      'cage_close.png',
+      'cage_open.png',
+    ].contains(fileName);
+
+    if (!isDynamicCage) return (cage.y + 1) * 64;
+
+    final cageBottomY = (cage.y + 1) * 64;
+    final playerBottomY = player.y + player.tileSize;
+    return cageBottomY > playerBottomY ? 0 : 99999;
+  }
+
   @override
   Widget buildWidget(double tileSize) {
     return Positioned(
@@ -80,97 +88,35 @@ class CageRenderObject extends RenderableObject {
   }
 }
 
-// 壁オブジェクト
-class WallRenderObject extends RenderableObject {
-  final int tileX;
-  final int tileY;
-  final String assetPath;
-  
-  WallRenderObject({
-    required this.tileX,
-    required this.tileY,
-    required this.assetPath,
-  });
-  
-  @override
-  double get x => tileX.toDouble();
-  
-  @override
-  double get y => tileY.toDouble();
-  
-  @override
-  double get sortY => (tileY + 1) * 64.0; // 壁の底部でソート（タイル座標をピクセル座標に変換）
-  
-  @override
-  Widget buildWidget(double tileSize) {
-    return Positioned(
-      left: tileSize * x,
-      top: tileSize * y,
-      width: tileSize,
-      height: tileSize,
-      child: Image.asset(
-        assetPath,
-        width: tileSize,
-        height: tileSize,
-        fit: BoxFit.fill,
-        filterQuality: FilterQuality.none,
-      ),
-    );
-  }
-}
-
 class DepthSortedLayer extends ConsumerWidget {
   final double tileSize;
   final PlayerModel player;
   final List<CageObject> cages;
+  final List<RenderableObject> otherObjects; // ← 追加
 
   const DepthSortedLayer({
     super.key,
     required this.tileSize,
     required this.player,
     required this.cages,
+    required this.otherObjects, // ← 追加
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cageState = ref.watch(cageStateProvider);
-    
-    // 全ての描画オブジェクトを収集
     List<RenderableObject> objects = [];
-    
-    // プレイヤーを追加
+
     objects.add(PlayerRenderObject(player));
-    
-    // 檻を追加
+
     for (final cage in cages) {
-      objects.add(CageRenderObject(cage));
+      objects.add(CageRenderObject(cage, player));
     }
-    
-    // 全ての壁を追加
-    for (int y = 0; y < TileMapWidget.roomHeight; y++) {
-      for (int x = 0; x < TileMapWidget.roomWidth; x++) {
-        if (TileMapWidget.roomMap[y][x] == 1) {
-          // 一番下の中央3つは除外（出入り口）
-          if (y == TileMapWidget.roomHeight - 1 && (x == 2 || x == 3 || x == 4)) {
-            continue;
-          }
-          
-          final asset = (x == 0 || x == TileMapWidget.roomWidth - 1 || y == TileMapWidget.roomHeight - 1)
-              ? 'assets/material/ceil.png'
-              : 'assets/material/prison_wall.png';
-          
-          objects.add(WallRenderObject(
-            tileX: x,
-            tileY: y,
-            assetPath: asset,
-          ));
-        }
-      }
-    }
-    
-    // Y座標でソート（上から下へ）
+
+    objects.addAll(otherObjects); // ← 他の素材を含める
+
     objects.sort((a, b) => a.sortY.compareTo(b.sortY));
-    
+
     return Stack(
       children: objects.map((obj) => obj.buildWidget(tileSize)).toList(),
     );
