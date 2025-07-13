@@ -56,3 +56,59 @@
 
 # ライセンス
 本プロジェクトは個人開発用です。公開・販売時には適切なライセンスを記述予定。
+
+# ディレクトリ
+lib/
+
+  main.dart
+
+  ui/
+
+    game/
+
+      data/
+
+        map_data.dart
+
+      engine/
+
+        depth_sorted_layer.dart
+
+        prison_object_layer.dart
+
+        tile_map_widget.dart
+
+        wall_layer.dart
+
+      models/
+
+        cage_state.dart
+
+        game_state.dart
+
+        player_model.dart
+
+    screens/
+
+      game_screen.dart
+
+      overlay/
+
+        game_ui_overlay.dart
+
+        models/
+
+          ui_state.dart
+
+        widgets/
+
+          action_buttons.dart
+
+          character_icon.dart
+
+          movement_controller.dart
+
+          possession_timer.dart
+
+          status_bar.dart
+
